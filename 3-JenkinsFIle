@@ -1,0 +1,42 @@
+//How to define conditionals when expression, so using this our test stage only run when condition is setisfied. other wise test stage is not going to run
+
+pipeline {
+    agent any
+
+    stages {
+        
+        stage('Building') {
+            steps {
+                echo 'The Code will be now be built into an artifact'
+            }
+        }
+        stage('Artifact Archiving') {
+            steps {
+                echo 'The Artifact will be uploaded to an artifact repository'
+            }
+        }
+        //basically this stage is only run when the build number was 10, or 15 other wise this step is not going to run i know its silly but its just for example
+        //you can give any type of condition in this expression block, so its only run this stage when condition is setisfied
+        stage('Testing') {
+            when {
+                expression{
+                    BUILD_DISPLAY_NAME == '#10' || BUILD_DISPLAY_NAME == '#15'
+                }
+            }
+            steps {
+                echo 'The Artifact will be tested'
+            }
+        }
+        stage('Staging') {
+            steps {
+                echo 'The Artifact is staged onto the staging server'
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                echo 'The software will now be deployed!'
+            }
+        }
+    }    
+}
