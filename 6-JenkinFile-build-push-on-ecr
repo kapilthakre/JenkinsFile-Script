@@ -1,0 +1,47 @@
+//Create a pipeline that gets data from git, builds angular application image on local and pushes into aws ECR.
+//note login aws cli from jenkins user.
+//Configure git ssh on jenkins
+pipeline {
+    agent any
+    environment{
+        //what docker image name you want to give.
+        DOCKER_IMAGE_NAME = "angular-application"
+        ECR_ACCOUNT_ID = "973180791708.dkr.ecr.ap-south-1.amazonaws.com"
+        ECR_REPO_NAME = "/demo-repo"
+        //This variable is return this type of string ex:  "973180791708.dkr.ecr.ap-south-1.amazonaws.com/demo-repo:angular-application-Build_No_9"
+        //So we can use this variable for giving name and tag to our build image
+        ECR_DOCKER_IMAGE_NAME_TAG = "${ECR_ACCOUNT_ID}${ECR_REPO_NAME}:${DOCKER_IMAGE_NAME}-Build_No_${BUILD_NUMBER}"
+        
+    }
+    stages {
+        stage('Git repo Cloning') {
+            steps {
+                git branch: 'main', credentialsId: 'Gitrepo_ssh', url: 'git@github.com:kapilthakre/Docker-Angular-Application.git'
+                echo "checking working dir.............${WORKSPACE}"
+                echo "checking working dir.............${ECR_DOCKER_IMAGE_NAME_TAG}"
+            }
+        }
+        
+        stage('Build Docker Image'){
+            steps{
+                //our Dockerfile is inside in this folder thats why
+                dir('aston-villa-app') {
+                    sh 'docker build -t ${ECR_DOCKER_IMAGE_NAME_TAG} .'
+                }
+            }
+        }
+        
+        stage('ECR LOGIN'){
+            steps{
+                sh 'aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 973180791708.dkr.ecr.ap-south-1.amazonaws.com'
+            }
+        }
+        
+        stage('Push image to ECR'){
+            steps{
+                sh 'docker push ${ECR_DOCKER_IMAGE_NAME_TAG}'
+            }
+        }
+        
+    }
+}
