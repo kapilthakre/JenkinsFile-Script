@@ -1,7 +1,7 @@
-//Before runing this pipeline plz configure git repo ssh key on jenkin,
+//Before runNing this pipeline plz configure git repo ssh key on jenkin,
 //Install ssh agent plugin in jenkins, then add aws server private key
 //This pipeline first Get the Data from git repo using ssh, upload that cloned git Data on our AWS Server, create dir Build docker images and 
-//Start the container on awsserver that's it.
+//Start the container on aws server that's it.
 
 pipeline {
     
