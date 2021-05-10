@@ -1,0 +1,15 @@
+//Simple way to connect AWS with Jenkins, You Only need to put aws private key on jenkins directory.
+//"StrictHostKeyChecking no" bassically its disable the prompt that asks you if you really want to connect, if this host is not in the known_hosts file.
+pipeline {
+    agent any
+    
+    stages {
+        stage('Authenticat AWS Server') {
+            steps {
+                sh 'pwd' 
+                sh 'ssh -o "StrictHostKeyChecking no" -i /var/lib/jenkins/secrets/secondaccountkey.pem ubuntu@ec2-13-233-254-95.ap-south-1.compute.amazonaws.com && pwd'
+            
+            }
+        }
+    }
+}
