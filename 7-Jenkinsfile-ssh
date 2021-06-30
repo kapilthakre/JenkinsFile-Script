@@ -1,0 +1,24 @@
+
+pipeline {
+    agent any
+    
+    stages {
+        stage('Git repo Cloning'){
+            steps{
+                sshagent(['oodles-aws-ssh']) {
+                   sh 'set -x && ssh -o "StrictHostKeyChecking no" ubuntu@89.50.2.132 "cd  /opt/docker/app/src/eyaln-farm  && git pull"'
+                   sh 'set -x && ssh -o "StrictHostKeyChecking no" ubuntu@89.50.2.132 "cd  /opt/docker/app/src/eyaln-farm  && git log -2"'
+                }
+            }
+        }
+        stage('Deploying Frontend'){
+            steps{
+                sshagent(['oodles-aws-ssh']) {
+                   sh 'set -x && ssh -o "StrictHostKeyChecking no" ubuntu@89.45.2.132 "docker-compose -f /opt/docker/app/docker-compose.yaml up -d --build" '
+                   sh 'set -x && sleep 5'
+                   sh 'set -x && ssh -o "StrictHostKeyChecking no" ubuntus@89.45.2.132 "docker  ps" ' 
+                }
+            }
+        }
+    }
+}
